@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analysis AI Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+        }
+
+        .nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .nav a:hover {
+            color: #60a5fa;
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .upload-section {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .upload-section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #f1f5f9;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(96, 165, 250, 0.5);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .upload-area:hover {
+            border-color: #60a5fa;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .upload-area.dragover {
+            border-color: #60a5fa;
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: rgba(96, 165, 250, 0.1);
+            color: #60a5fa;
+            border: 1px solid #60a5fa;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(96, 165, 250, 0.2);
+        }
+
+        .results-section {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .results-section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #f1f5f9;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-card {
+            background: rgba(71, 85, 105, 0.2);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #60a5fa;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .tab-btn {
+            padding: 10px 15px;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(71, 85, 105, 0.1);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+        }
+
+        .stat-value {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(96, 165, 250, 0.3);
+            border-top-color: #60a5fa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            color: #86efac;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .success.active {
+            display: block;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .column-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .column-item {
+            background: rgba(71, 85, 105, 0.1);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        .column-name {
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .column-type {
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .nav {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">📊</div>
+                <span>Data Analysis AI Agent</span>
+            </div>
+            <nav class="nav">
+                <a href="#features">Features</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <h2>Upload Your Data</h2>
+                
+                <div id="errorMsg" class="error"></div>
+                <div id="successMsg" class="success"></div>
+
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drag and drop your file here</div>
+                    <div class="upload-hint">or click to browse</div>
+                </div>
+                <input type="file" id="fileInput" accept=".csv,.xlsx,.json">
+                
+                <button class="btn" onclick="document.getElementById('fileInput').click()">
+                    Choose File
+                </button>
+
+                <div id="loadingUpload" class="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 10px; font-size: 13px;">Uploading...</p>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <h2>Analysis Results</h2>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+                    <button class="tab-btn" onclick="switchTab('columns')">Columns</button>
+                    <button class="tab-btn" onclick="switchTab('missing')">Missing Values</button>
+                </div>
+
+                <div id="overview" class="tab-content active">
+                    <div class="info-grid" id="overviewGrid">
+                        <div class="info-card">
+                            <div class="info-label">Rows</div>
+                            <div class="info-value" id="rowCount">0</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">Columns</div>
+                            <div class="info-value" id="colCount">0</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">File Name</div>
+                            <div class="info-value" id="fileName" style="font-size: 14px;">-</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">Uploaded</div>
+                            <div class="info-value" id="uploadTime" style="font-size: 12px;">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="columns" class="tab-content">
+                    <div class="column-list" id="columnList"></div>
+                </div>
+
+                <div id="missing" class="tab-content">
+                    <div class="stats-list" id="missingList"></div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn" onclick="analyzeData()">🔍 Analyze</button>
+                    <button class="btn btn-secondary" onclick="generateInsights()">💡 Get Insights</button>
+                    <button class="btn btn-secondary" onclick="visualizeData()">📈 Visualize</button>
+                    <button class="btn btn-secondary" onclick="resetUpload()">↺ Reset</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Data Analysis AI Agent v1.0 | Built with Flask & Python</p>
+        </footer>
+    </div>
+
+    <script>
+        let currentFile = null;
+        let currentData = null;
+
+        // Upload area drag & drop
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                uploadFile();
+            }
+        });
+
+        fileInput.addEventListener('change', uploadFile);
+
+        function showError(msg) {
+            const errorDiv = document.getElementById('errorMsg');
+            errorDiv.textContent = msg;
+            errorDiv.classList.add('active');
+            setTimeout(() => errorDiv.classList.remove('active'), 5000);
+        }
+
+        function showSuccess(msg) {
+            const successDiv = document.getElementById('successMsg');
+            successDiv.textContent = msg;
+            successDiv.classList.add('active');
+            setTimeout(() => successDiv.classList.remove('active'), 5000);
+        }
+
+        function uploadFile() {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const loading = document.getElementById('loadingUpload');
+            loading.classList.add('active');
+
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                loading.classList.remove('active');
+                if (data.success) {
+                    currentFile = file.name;
+                    currentData = data.data;
+                    displayResults(data.data);
+                    showSuccess('File uploaded successfully!');
+                } else {
+                    showError(data.error || 'Upload failed');
+                }
+            })
+            .catch(err => {
+                loading.classList.remove('active');
+                showError('Upload error: ' + err.message);
+            });
+        }
+
+        function displayResults(data) {
+            document.getElementById('resultsSection').classList.add('active');
+            document.getElementById('rowCount').textContent = data.rows.toLocaleString();
+            document.getElementById('colCount').textContent = data.columns;
+            document.getElementById('fileName').textContent = data.filename;
+            document.getElementById('uploadTime').textContent = new Date().toLocaleTimeString();
+
+            // Columns
+            const columnList = document.getElementById('columnList');
+            columnList.innerHTML = data.column_names.map(col => `
+                <div class="column-item">
+                    <div class="column-name">${col}</div>
+                    <div class="column-type">${data.dtypes[col]}</div>
+                </div>
+            `).join('');
+
+            // Missing values
+            const missingList = document.getElementById('missingList');
+            const missing = data.missing_values;
+            const hasMissing = Object.values(missing).some(v => v > 0);
+            if (hasMissing) {
+                missingList.innerHTML = Object.entries(missing)
+                    .filter(([_, v]) => v > 0)
+                    .map(([col, count]) => `
+                        <div class="stat-item">
+                            <span class="stat-label">${col}</span>
+                            <span class="stat-value">${count} missing</span>
+                        </div>
+                    `).join('');
+            } else {
+                missingList.innerHTML = '<div class="stat-item" style="color: #22c55e;"><span>✓ No missing values</span></div>';
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function analyzeData() {
+            if (!currentData) return;
+            showSuccess('Analysis in progress...');
+            // Add analysis logic here
+        }
+
+        function generateInsights() {
+            if (!currentData) return;
+            showSuccess('Generating insights...');
+            // Add insights generation logic here
+        }
+
+        function visualizeData() {
+            if (!currentData) return;
+            showSuccess('Creating visualizations...');
+            // Add visualization logic here
+        }
+
+        function resetUpload() {
+            fileInput.value = '';
+            currentFile = null;
+            currentData = null;
+            document.getElementById('resultsSection').classList.remove('active');
+            showSuccess('Ready for new upload');
+        }
+    </script>
+</body>
+</html>
